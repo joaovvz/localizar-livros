@@ -122,3 +122,26 @@ if ('serviceWorker' in navigator) {
             .catch(err => console.error("Erro ao registrar Service Worker:", err));
     });
 }
+let deferredPrompt;
+const installBtn = document.getElementById('installBtn');
+
+window.addEventListener('beforeinstallprompt', (e) => {
+    // Impede o prompt automático
+    e.preventDefault();
+    deferredPrompt = e;
+    installBtn.hidden = false; // Mostra o botão
+
+    installBtn.addEventListener('click', () => {
+        installBtn.hidden = true; // Esconde o botão após clique
+        deferredPrompt.prompt(); // Exibe o prompt nativo
+
+        deferredPrompt.userChoice.then((choiceResult) => {
+            if (choiceResult.outcome === 'accepted') {
+                console.log('Usuário aceitou a instalação');
+            } else {
+                console.log('Usuário recusou a instalação');
+            }
+            deferredPrompt = null;
+        });
+    });
+});
